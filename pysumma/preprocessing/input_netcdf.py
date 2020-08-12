@@ -24,12 +24,9 @@ def InitialCond_from_csv(hru_path, ifcToto_path, midToto_path, name):
     # Create Dimension in a netCDF file
     hru = initial_cond.createDimension("hru", len(hru_initial_cond.index))
     scalarv = initial_cond.createDimension("scalarv", 1)
-    ifcToto = initial_cond.createDimension("ifcToto", len(
-        ifcToto_initial_cond.index)/len(hru_initial_cond.index))
-    midToto = initial_cond.createDimension("midToto", len(
-        midToto_initial_cond.index)/len(hru_initial_cond.index))
-    midSoil = initial_cond.createDimension("midSoil", len(
-        midToto_initial_cond.index) / len(hru_initial_cond.index))
+    ifcToto = initial_cond.createDimension("ifcToto", len(ifcToto_initial_cond.index)/len(hru_initial_cond.index))
+    midToto = initial_cond.createDimension("midToto", len(midToto_initial_cond.index)/len(hru_initial_cond.index))
+    midSoil = initial_cond.createDimension("midSoil", len(midToto_initial_cond.index)/len(hru_initial_cond.index))
 
     # set initial_condition_variables
     hru_initial_cond_variables = ['nSnow', 'nSoil']
@@ -37,8 +34,7 @@ def InitialCond_from_csv(hru_path, ifcToto_path, midToto_path, name):
                                       "scalarCanopyTemp", "scalarSnowAlbedo", "scalarSWE", "scalarSnowDepth",
                                       "scalarSfcMeltPond", "scalarAquiferStorage"]
     ifcToto_initial_cond_variables = ["iLayerHeight"]
-    midToto_initial_cond_variables = [
-        "mLayerDepth", "mLayerTemp", "mLayerVolFracIce", "mLayerVolFracLiq"]
+    midToto_initial_cond_variables = ["mLayerDepth", "mLayerTemp", "mLayerVolFracIce", "mLayerVolFracLiq"]
     midSoil_initial_cond_variables = ["mLayerMatricHead"]
 
     for var_name in hru_initial_cond_variables:
@@ -51,15 +47,15 @@ def InitialCond_from_csv(hru_path, ifcToto_path, midToto_path, name):
 
     for var_name in ifcToto_initial_cond_variables:
         data = initial_cond.createVariable(var_name, "f8", ("ifcToto", "hru",))
-        data[:] = ifcToto_initial_cond[[var_name]].values
+        data[:] = ifcToto_initial_cond[[var_name]].values.reshape(len(ifcToto_initial_cond.index)/len(hru_initial_cond.index), len(hru_initial_cond.index))
 
     for var_name in midToto_initial_cond_variables:
         data = initial_cond.createVariable(var_name, "f8", ("midToto", "hru",))
-        data[:] = midToto_initial_cond[[var_name]].values
+        data[:] = midToto_initial_cond[[var_name]].values.reshape(len(midToto_initial_cond.index)/len(hru_initial_cond.index), len(hru_initial_cond.index))
 
     for var_name in midSoil_initial_cond_variables:
         data = initial_cond.createVariable(var_name, "f8", ("midSoil", "hru",))
-        data[:] = midToto_initial_cond[[var_name]].values
+        data[:] = midToto_initial_cond[[var_name]].values.reshape(len(midToto_initial_cond.index)/len(hru_initial_cond.index), len(hru_initial_cond.index))
 
     initial_cond.close()
 
