@@ -47,15 +47,15 @@ def InitialCond_from_csv(hru_path, ifcToto_path, midToto_path, name):
 
     for var_name in ifcToto_initial_cond_variables:
         data = initial_cond.createVariable(var_name, "f8", ("ifcToto", "hru",))
-        data[:] = ifcToto_initial_cond[[var_name]].values.reshape(len(ifcToto_initial_cond.index)/len(hru_initial_cond.index), len(hru_initial_cond.index))
+        data[:] = ifcToto_initial_cond[[var_name]].values.reshape(int(len(ifcToto_initial_cond.index)/len(hru_initial_cond.index)), int(len(hru_initial_cond.index)))
 
     for var_name in midToto_initial_cond_variables:
         data = initial_cond.createVariable(var_name, "f8", ("midToto", "hru",))
-        data[:] = midToto_initial_cond[[var_name]].values.reshape(len(midToto_initial_cond.index)/len(hru_initial_cond.index), len(hru_initial_cond.index))
+        data[:] = midToto_initial_cond[[var_name]].values.reshape(int(len(midToto_initial_cond.index)/len(hru_initial_cond.index)), int(len(hru_initial_cond.index)))
 
     for var_name in midSoil_initial_cond_variables:
         data = initial_cond.createVariable(var_name, "f8", ("midSoil", "hru",))
-        data[:] = midToto_initial_cond[[var_name]].values.reshape(len(midToto_initial_cond.index)/len(hru_initial_cond.index), len(hru_initial_cond.index))
+        data[:] = midToto_initial_cond[[var_name]].values.reshape(int(len(midToto_initial_cond.index)/len(hru_initial_cond.index)), int(len(hru_initial_cond.index)))
 
     initial_cond.close()
 
