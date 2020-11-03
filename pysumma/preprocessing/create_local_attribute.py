@@ -195,3 +195,43 @@ class LocalAttributes(object):
                 else:
                     pass
         return lulc
+
+    def gru_local_attributes(self, gru_name, gru_num, dir_grassdata, hru_start_num, hru_area, contour_length=10, slopeTypeIndex=1, vegTypeIndex_option='USGS'):
+        gru_drain = tif_to_dataframe(os.path.join(dir_grassdata, gru_name +"_drain.tif"))
+        gru_drain_1_col = tif_to_dataframe_one_col(os.path.join(dir_grassdata, gru_name +"_drain.tif"), "fdr")
+        # numbering unique value(hruid) in each cell of rasters
+        gru_drain_1_col = hru_id(gru_drain_1_col, 'fdr', null_num=255, hru_id_col_name="hruId", start_num=hru_start_num)
+        # create 'contourLength'
+        gru_drain_1_col = one_col_add(gru_drain_1_col, 'contourLength', value=contour_length)
+        # create 'downHRUindex'
+        downHRUindex = down_hru_index(gru_drain_1_col, gru_drain, hru_id_col_name="hruId", downhruindex_col_name="downHRUindex")
+        # create 'elevation'
+        dem_one_col = tif_to_dataframe_one_col(os.path.join(dir_grassdata, gru_name +"_dem.tif"), "elevation")
+        gru = one_col_add(downHRUindex, 'elevation', value=dem_one_col.values)
+        # create 'hru', 'gruId', and 'hru2gruId'
+        gru = one_col_add(gru, 'gruId', value=gru_num)
+        gru = one_col_add(gru, 'hru2gruId', value=gru_num)
+        # create 'HRUarea'
+        gru = one_col_add(gru, 'HRUarea', value=hru_area)
+        # create 'latitude' and 'longitude" (need to change to lon, lat)
+        latitude_one_col = tif_to_dataframe_one_col(os.path.join(dir_grassdata, gru_name +"_ymap.tif"), "latitude")
+        longitude_one_col = tif_to_dataframe_one_col(os.path.join(dir_grassdata, gru_name +"_xmap.tif"), "longitude")
+        gru = one_col_add(gru, 'latitude', value=latitude_one_col.values)
+        gru = one_col_add(gru, 'longitude', value=longitude_one_col.values)
+        # create 'mHeight'
+        gru = one_col_add(gru, 'mHeight', value=gru['elevation'] + 2)
+        # create 'slopeTypeIndex'
+        gru = one_col_add(gru, 'slopeTypeIndex', value=slopeTypeIndex)
+        # create 'tan_slope'
+        tan_slope_one_col = tif_to_dataframe_one_col(os.path.join(dir_grassdata, gru_name +"_slope.tif"), "slope")
+        gru = one_col_add(gru, 'tan_slope', value=tan_slope_one_col.values)
+        # create 'soilTypeIndex' (Ask Laurence soil_id meaning)
+        soil_array_one_col = tif_to_dataframe_one_col(os.path.join(dir_grassdata, gru_name +"_soil_id.tif"), "soilTypeIndex")
+        gru = one_col_add(gru, 'soilTypeIndex', value=soil_array_one_col.values)
+        # create 'vegTypeIndex'
+        nlcd_one_col = tif_to_dataframe_one_col(os.path.join(dir_grassdata, gru_name +"_NLCD.tif"), "vegTypeIndex")
+        vegTypeIndex = lulc_index(nlcd_one_col, option=vegTypeIndex_option)
+        gru = one_col_add(gru, 'vegTypeIndex', value=vegTypeIndex.values)
+        gru = gru.drop('fdr', 1)
+        gru = gru.dropna()
+        return gru
