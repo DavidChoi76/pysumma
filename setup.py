@@ -1,7 +1,10 @@
+import versioneer
 from setuptools import setup, find_packages
 
+
 setup(name='pysumma',
-      version='3.0.0',
+      version=versioneer.get_version(),
+      cmdclass=versioneer.get_cmdclass(),
       description='A python wrapper for SUMMA',
       url='https://github.com/UW-Hydro/pysumma.git',
       author='YoungDon Choi, Andrew Bennett',
@@ -9,18 +12,24 @@ setup(name='pysumma',
       license='MIT',
       packages=find_packages(),
       install_requires=[
-          'numpy',
-          'xarray>0.10.9',
+          'xarray>=0.11.0',
+          'pandas',
+          'netcdf4>=1.2.5',
+          'numpy>=1.11.2',
+          'dask',
+          'distributed',
+          'toolz',
+          'pytest',
           'matplotlib',
           'geopandas',
-          'shapely',
-          'seaborn',
-          'pandas>=0.25',
-          'hs_restclient',
-          'distributed',
+          'pandas',
+          'hs_restclient'
+          ],
+       extras_require={'plotting': [
           'fiona',
           'cartopy',
-          'netcdf4'
-          ],
+          'shapely',
+          'seaborn'
+          ],},
       include_package_data=True,
       test_suite='pysumma.tests')

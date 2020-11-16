@@ -91,7 +91,9 @@ class Ensemble(object):
                 decision_dims[k] = v
             for k, v in conf.get('file_manager', {}).items():
                 manager_dims[k] = v
-            for k, v in conf.get('parameters', {}).items():
+            #for k, v in conf.get('parameters', {}).items():
+            #    parameter_dims[k] = v
+            for k, v in conf.get('trial_parameters', {}).items():
                 parameter_dims[k] = v
         return {'decisions': decision_dims,
                 'managers': manager_dims,
@@ -120,9 +122,9 @@ class Ensemble(object):
             decision_names[i] = '++'.join(l.split('=')[0] for l in t)
         new_idx = pd.MultiIndex.from_tuples(
             decision_tuples, names=new_coords)
-        out_file_paths = [s.get_output() for s in self.simulations.values()]
+        out_file_paths = [s.get_output_files() for s in self.simulations.values()]
         out_file_paths = [fi for sublist in out_file_paths for fi in sublist]
-        full = xr.open_mfdataset(out_file_paths, concat_dim='run_number')
+        full = xr.open_mfdataset(out_file_paths, concat_dim='run_number', combine='nested')
         merged = full.assign_coords(run_number=decision_names)
         merged['run_number'] = new_idx
         merged = merged.unstack('run_number')
@@ -159,6 +161,20 @@ class Ensemble(object):
             Whether to halt operation until runs are complete
         """
         self.start(run_option, prerun_cmds)
+        if monitor:
+            return self.monitor()
+        else:
+            return True
+
+    def map(self, fun, args, include_sims=True, monitor=True):
+        for n, s in self.simulations.items():
+            config = self.configuration[n]
+            if include_sims:
+                all_args = (s, n, *args, {'config': config})
+            else:
+                all_args = (*args, {'config': config})
+            self.submissions.append(self._client.submit(
+                fun, *all_args))
         if monitor:
             return self.monitor()
         else:
