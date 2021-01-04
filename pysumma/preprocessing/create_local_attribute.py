@@ -196,7 +196,7 @@ class LocalAttributes(object):
                     pass
         return lulc
 
-    def gru_local_attributes(self, gru_name, gru_num, dir_grassdata, hru_start_num, hru_area, contour_length=10, slopeTypeIndex=1, vegTypeIndex_option='USGS'):
+    def gru_local_attributes(gru_name, gru_num, dir_grassdata, hru_start_num, hru_area, contour_length=10, slopeTypeIndex=1, vegTypeIndex_option='USGS'):
         gru_drain = tif_to_dataframe(os.path.join(dir_grassdata, gru_name +"_drain.tif"))
         gru_drain_1_col = tif_to_dataframe_one_col(os.path.join(dir_grassdata, gru_name +"_drain.tif"), "fdr")
         # numbering unique value(hruid) in each cell of rasters
