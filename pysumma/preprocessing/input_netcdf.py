@@ -124,7 +124,7 @@ def ParamTrial_from_csv(csv_path, name):
 
     # Create Dimension in a netCDF file
     hru = parameter_trial.createDimension("hru", len(hru_parameter_trial.index))
-    scalarv = parameter_trial.createDimension("scalarv", 1)
+    #scalarv = parameter_trial.createDimension("scalarv", 1)
 
     # set initial_condition_variables
     scalarv_initial_cond_variables = ["frozenPrecipMultip", "theta_mp", "theta_sat", "theta_res", "vGn_alpha", "vGn_n", "f_impede", "k_soil",
@@ -132,7 +132,7 @@ def ParamTrial_from_csv(csv_path, name):
                                       "heightCanopyBottom", "kAnisotropic", "zScale_TOPMODEL", "qSurfScale", "fieldCapacity"]
 
     for var_name in scalarv_initial_cond_variables:
-        data = parameter_trial.createVariable(var_name, "f8", ("scalarv", "hru",))
+        data = parameter_trial.createVariable(var_name, "f8", ("hru",))
         data[:] = hru_parameter_trial[[var_name]].values
 
     parameter_trial.close()
