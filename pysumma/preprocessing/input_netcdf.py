@@ -108,3 +108,31 @@ def LocalAttribute_from_csv(localattri_path, name):
         data[:] = loca_attri_data[var_name].unique()
 
     loca_attri.close()
+
+def ParamTrial_from_csv(csv_path, name):
+    """Create parameter trial netcdf from csv file
+
+    Args:
+        hru_path (csv file): A CSV file with variables using hru Dimensions
+        name (text): Set the name of netcdf (ex. param_trial.nc)
+    """
+
+    # Create a netCDF file
+    parameter_trial = Dataset(name, "w", format="NETCDF3_CLASSIC")
+    # Read csv file using Panda
+    hru_parameter_trial = pd.read_csv(csv_path, sep=',')
+
+    # Create Dimension in a netCDF file
+    hru = hru_parameter_trial.createDimension("hru", len(hru_parameter_trial.index))
+    scalarv = parameter_trial.createDimension("scalarv", 1)
+
+    # set initial_condition_variables
+    scalarv_initial_cond_variables = ["frozenPrecipMultip", "theta_mp", "theta_sat", "theta_res", "vGn_alpha", "vGn_n", "f_impede", "k_soil",
+                                      "k_macropore", "critSoilWilting", "critSoilTranspire", "winterSAI", "summerLAI", "heightCanopyTop",
+                                      "heightCanopyBottom", "kAnisotropic", "zScale_TOPMODEL", "qSurfScale", "fieldCapacity"]
+
+    for var_name in scalarv_initial_cond_variables:
+        data = parameter_trial.createVariable(var_name, "f8", ("scalarv", "hru",))
+        data[:] = hru_parameter_trial[[var_name]].values
+
+    parameter_trial.close()
