@@ -123,7 +123,7 @@ def ParamTrial_from_csv(csv_path, name):
     hru_parameter_trial = pd.read_csv(csv_path, sep=',')
 
     # Create Dimension in a netCDF file
-    hru = hru_parameter_trial.createDimension("hru", len(hru_parameter_trial.index))
+    hru = parameter_trial.createDimension("hru", len(hru_parameter_trial.index))
     scalarv = parameter_trial.createDimension("scalarv", 1)
 
     # set initial_condition_variables
